@@ -1,7 +1,5 @@
 package com.cj.jshintmojo;
 
-import static com.cj.jshintmojo.util.Util.*;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,13 +9,15 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -26,7 +26,6 @@ import org.codehaus.plexus.util.StringUtils;
 
 import com.cj.jshintmojo.cache.Cache;
 import com.cj.jshintmojo.cache.Result;
-import com.cj.jshintmojo.jshint.EmbeddedJshintCode;
 import com.cj.jshintmojo.jshint.FunctionalJava;
 import com.cj.jshintmojo.jshint.FunctionalJava.Fn;
 import com.cj.jshintmojo.jshint.JSHint;
@@ -38,7 +37,7 @@ import com.cj.jshintmojo.reporter.JSLintReporter;
 import com.cj.jshintmojo.util.OptionsParser;
 import com.cj.jshintmojo.util.Util;
 
-import java.util.Collections;
+import static com.cj.jshintmojo.util.Util.mkdirs;
 
 /**
  * @goal lint
@@ -46,7 +45,6 @@ import java.util.Collections;
  * @threadSafe
  */
 public class Mojo extends AbstractMojo {
-
 	/**
 	 * @parameter property="directories"
 	 */
@@ -86,11 +84,6 @@ public class Mojo extends AbstractMojo {
 	 * @parameter property="ignoreFile"
 	 */
 	private String ignoreFile = "";
-
-    /**
-     * @parameter property="jshint.version"
-     */
-    private String version = "2.5.6";
 	
 	/**
 	 * @parameter 
@@ -121,17 +114,17 @@ public class Mojo extends AbstractMojo {
 	}
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
-	    getLog().info("using jshint version " + version);
-
-	    final String jshintCode = getEmbeddedJshintCode(version);
 	    
-        final JSHint jshint = new JSHint(jshintCode);
+        String version = getJSHintVersion();
+        getLog().info("using jshint version " + version);
+
+        final JSHint jshint = new JSHint(getJSHintScript(version));
 
         final Config config = readConfig(this.options, this.globals, this.configFile, this.basedir, getLog());
         if (this.excludes.isEmpty() || (this.ignoreFile != null && !this.ignoreFile.isEmpty())) {
             this.excludes.addAll(readIgnore(this.ignoreFile, this.basedir, getLog()).lines);
         }
-        final Cache.Hash cacheHash = new Cache.Hash(config.options, config.globals, this.version, this.configFile, this.directories, this.excludes);
+        final Cache.Hash cacheHash = new Cache.Hash(config.options, config.globals, version, this.configFile, this.directories, this.excludes);
 		
 		if(directories.isEmpty()){
 			directories.add("src");
@@ -155,7 +148,23 @@ public class Mojo extends AbstractMojo {
 			throw new MojoExecutionException("Something bad happened", e);
 		}
 	}
-	
+
+	public static String getJSHintScript(String version)
+	{
+	    return String.format("/META-INF/resources/webjars/jshint/%s/jshint.js", version);
+	}
+
+    public static String getJSHintVersion() throws MojoExecutionException
+    {
+        try {
+            Properties jsHintProperties = new Properties();
+            jsHintProperties.load(Mojo.class.getResourceAsStream("/META-INF/maven/org.webjars/jshint/pom.properties"));
+            return jsHintProperties.getProperty("version");
+        } catch (IOException e) {
+            throw new MojoExecutionException("Failed to determine the JSHint version in use.", e);
+        }
+    }
+
 	static class Config {
 	    final String options, globals;
 
@@ -357,20 +366,6 @@ public class Mojo extends AbstractMojo {
         }
     }
 
-    @SuppressWarnings("serial")
-    private static String getEmbeddedJshintCode(String version) throws MojoFailureException {
-        
-        final String resource = EmbeddedJshintCode.EMBEDDED_VERSIONS.get(version);
-        if(resource==null){
-            StringBuffer knownVersions = new StringBuffer();
-            for(String v : EmbeddedJshintCode.EMBEDDED_VERSIONS.keySet()){
-                knownVersions.append("\n    " + v);
-            }
-            throw new MojoFailureException("I don't know about the \"" + version + "\" version of jshint.  Here are the versions I /do/ know about: " + knownVersions);
-        }
-        return resource;
-    }
-    
     private static File findJshintrc(File cwd) {
         File placeToLook = cwd;
         while(placeToLook.getParentFile()!=null){
@@ -398,12 +393,6 @@ public class Mojo extends AbstractMojo {
 
         return null;
     }
-
-	private static boolean nullSafeEquals(String a, String b) {
-		if(a==null && b==null) return true;
-		else if(a==null || b==null) return false;
-		else return a.equals(b);
-	}
 
 	private Cache readCache(File path, Cache.Hash hash){
 		try {

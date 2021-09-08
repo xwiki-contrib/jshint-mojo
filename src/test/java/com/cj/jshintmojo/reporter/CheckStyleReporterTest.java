@@ -1,30 +1,30 @@
 package com.cj.jshintmojo.reporter;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Test cases of {@link CheckStyleReporter}.
  */
-public class CheckStyleReporterTest {
+class CheckStyleReporterTest {
 
     private final CheckStyleReporter reporter = new CheckStyleReporter();
 
     @Test
-    public void formatType() {
+    void formatType() {
         assertThat(CheckStyleReporter.FORMAT, is("checkstyle"));
     }
 
     @Test
-    public void reportNullResults() {
+    void reportNullResults() {
         String report = this.reporter.report(null);
         assertThat(report, is(""));
     }
 
     @Test
-    public void reportAllPassedResults() {
+    void reportAllPassedResults() {
         String report = this.reporter.report(
                 JSHintReporterTestUtil.createAllPassedResults());
         assertThat(report, is(
@@ -34,7 +34,7 @@ public class CheckStyleReporterTest {
     }
 
     @Test
-    public void reportSingleFileFailedResults() {
+    void reportSingleFileFailedResults() {
         String report = this.reporter.report(
                 JSHintReporterTestUtil.createSingleFileFailedResults());
         assertThat(report, is(
@@ -49,7 +49,7 @@ public class CheckStyleReporterTest {
     }
 
     @Test
-    public void reportMultipleFilesFailedResults() {
+    void reportMultipleFilesFailedResults() {
         String report = this.reporter.report(
                 JSHintReporterTestUtil.createMultipleFilesFailedResults());
         assertThat(report, is(
@@ -69,5 +69,4 @@ public class CheckStyleReporterTest {
                 "\t</file>\n" +
                 "</checkstyle>\n"));
     }
-
 }

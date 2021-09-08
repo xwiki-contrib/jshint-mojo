@@ -1,19 +1,19 @@
 package com.cj.jshintmojo.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class OptionsParserTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class OptionsParserTest {
 
 	@Test
-	public void testGetGlobals() throws IOException {
+	void testGetGlobals() throws IOException {
 		// given
 		byte[] configFileContents = FileUtils.readFileToByteArray(new File("src/test/resources/jshint.conf.js"));
 
@@ -27,7 +27,7 @@ public class OptionsParserTest {
 	}
 
 	@Test
-	public void testGetOptions() throws IOException {
+	void testGetOptions() throws IOException {
 		// given
 		byte[] configFileContents = FileUtils.readFileToByteArray(new File("src/test/resources/jshint.conf.js"));
 

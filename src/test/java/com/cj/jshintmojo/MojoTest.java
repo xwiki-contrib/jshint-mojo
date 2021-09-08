@@ -1,24 +1,22 @@
 package com.cj.jshintmojo;
 
-import static com.cj.jshintmojo.util.Util.*;
-import static org.apache.commons.io.FileUtils.writeStringToFile;
-import static org.junit.Assert.*;
-
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class MojoTest {
+import static com.cj.jshintmojo.util.Util.deleteDirectory;
+import static com.cj.jshintmojo.util.Util.mkdirs;
+import static com.cj.jshintmojo.util.Util.tempDir;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    
-
+class MojoTest {
     @Test
-    public void walksTheDirectoryTreeToFindAndUseJshintFiles() throws Exception {
+    void walksTheDirectoryTreeToFindAndUseJshintFiles() throws Exception {
         String[] jshintIgnorePaths = {".jshintignore", "foo/.jshintignore", "foo/bar/.jshintignore", "foo/bar/baz/.jshintignore"};
         
         for(String jshintIgnorePath: jshintIgnorePaths){
@@ -26,13 +24,13 @@ public class MojoTest {
             try{
                 // given
                 File ignoreFile = new File(directory, jshintIgnorePath);
-                FileUtils.writeStringToFile(ignoreFile, "src/main/resources/foo.qunit.js");
+                FileUtils.writeStringToFile(ignoreFile, "src/main/resources/foo.qunit.js", StandardCharsets.UTF_8);
                 
                 File projectDirectory = mkdirs(directory, "foo/bar/baz");
                 File resourcesDirectory = mkdirs(projectDirectory, "src/main/resources");
                 
                 File fileToIgnore = new File(resourcesDirectory, "foo.qunit.js");
-                FileUtils.writeStringToFile(fileToIgnore, "whatever, this should be ignored");
+                FileUtils.writeStringToFile(fileToIgnore, "whatever, this should be ignored", StandardCharsets.UTF_8);
                 
                 LogStub log = new LogStub();
                 Mojo mojo = new Mojo("", "", 
@@ -45,8 +43,8 @@ public class MojoTest {
                 mojo.execute();
                 
                 // then
-                assertTrue("Sees ignore files", log.hasMessage("info", "Using ignore file: " + ignoreFile.getAbsolutePath()));
-                assertTrue("Uses ignore files", log.hasMessage("warn", "Excluding " + fileToIgnore.getAbsolutePath()));
+                assertTrue(log.hasMessage("info", "Using ignore file: " + ignoreFile.getAbsolutePath()), "Sees ignore files");
+                assertTrue(log.hasMessage("warn", "Excluding " + fileToIgnore.getAbsolutePath()), "Uses ignore files");
                 
             }finally{
                 deleteDirectory(directory);
@@ -55,7 +53,7 @@ public class MojoTest {
     }
     
 	@Test
-	public void warnsUsersWhenConfiguredToWorkWithNonexistentDirectories() throws Exception {
+	void warnsUsersWhenConfiguredToWorkWithNonexistentDirectories() throws Exception {
 		File directory = tempDir();
 		try{
 			// given
@@ -82,7 +80,7 @@ public class MojoTest {
 	}
 	
 	@Test
-	public void resolvesConfigFileRelativeToMavenBasedirProperty() throws Exception {
+	void resolvesConfigFileRelativeToMavenBasedirProperty() throws Exception {
 		File directory = tempDir();
 		try{
 			// given

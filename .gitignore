@@ -4,4 +4,6 @@
 *.iml
 .idea
 target
+bin
 *~
+/target-eclipse/

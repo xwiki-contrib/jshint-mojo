@@ -1,16 +1,17 @@
 package com.cj.jshintmojo.jshint;
 
-import com.cj.jshintmojo.util.Rhino;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.CharEncoding;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
 
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import com.cj.jshintmojo.util.Rhino;
 
 public class JSHint {
 
@@ -25,10 +26,25 @@ public class JSHint {
                             "quit=function(){};" +
                             "arguments=[];");
 
-            rhino.eval (commentOutTheShebang (resourceAsString (jshintCode)));
+            rhino.eval(adaptForRhino(commentOutTheShebang(resourceAsString(jshintCode))));
         } catch (EcmaError e) {
             throw new RuntimeException ("Javascript eval error:" + e.getScriptStackTrace (), e);
         }
+    }
+
+    /**
+     * Fix the JSHint code to work with Rhino. The following issues are addressed:
+     * <ul>
+     * <li><a href="https://github.com/jshint/jshint/issues/2308">Rhino fails on jshint@2.7.0 #2308</a></li>
+     * </ul>
+     * 
+     * @param jsHintCode the JSHint code
+     * @return the modified JSHint code that works with Rhino
+     */
+    private String adaptForRhino(String jsHintCode)
+    {
+        // Apply the fix suggested in https://github.com/segrey/jshint/commit/1824d740c2d6656e663de43cf6d95fc8a642c796
+        return jsHintCode.replace(" window = {};", " global = this;");
     }
 
     private String commentOutTheShebang (String code) {
@@ -93,7 +109,7 @@ public class JSHint {
 
     private static String toString (InputStream in) {
         try {
-            return IOUtils.toString (in, CharEncoding.UTF_8);
+            return IOUtils.toString (in, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RuntimeException (e);
         }

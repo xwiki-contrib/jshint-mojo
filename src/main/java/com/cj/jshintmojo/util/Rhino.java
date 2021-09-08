@@ -12,8 +12,10 @@ public class Rhino {
 
 	public Rhino() {
 		// dummy readFile function to avoid undefined error
-		scope.defineProperty("readFile", new BaseFunction() {},
-				ScriptableObject.DONTENUM);
+        scope.defineProperty("readFile", new BaseFunction()
+        {
+            private static final long serialVersionUID = 1L;
+        }, ScriptableObject.DONTENUM);
 	}
 
 	public <T> T eval(String code){
