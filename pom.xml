@@ -65,4 +65,15 @@
       <artifactId>hamcrest-library</artifactId>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <!-- Disable linting because we have to use unknown tags such as @goal, @phase and @threadSafe. -->
+          <doclint>none</doclint>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
