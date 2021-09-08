@@ -6,7 +6,7 @@
     <version>13.7</version>
   </parent>
   <artifactId>jshint-maven-plugin</artifactId>
-  <version>1.8-SNAPSHOT</version>
+  <version>1.7.1</version>
   <packaging>maven-plugin</packaging>
   <name>${project.artifactId}</name>
   <description>A maven mojo that integrates the JSHint JavaScript preprocessor.</description>
@@ -28,7 +28,7 @@
     <connection>scm:git:git@github.com:xwiki-contrib/jshint-mojo.git</connection>
     <url>scm:git:git@github.com:xwiki-contrib/jshint-mojo.git</url>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/jshint-mojo.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>jshint-maven-plugin-1.7.1</tag>
   </scm>
   <dependencies>
     <dependency>
