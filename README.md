@@ -1,4 +1,4 @@
-# Simple JSHint Mojo
+# Simple JSHint Mojo [![Build Status](http://ci.xwiki.org/job/XWiki%20Contrib/job/jshint-mojo/job/master/badge/icon)](http://ci.xwiki.org/view/Contrib/job/XWiki%20Contrib/job/jshint-mojo/job/master/)
 
 It's real simple and it runs [JSHint](http://www.jshint.com/) on your *.js files.
 
