@@ -151,14 +151,14 @@ public class Mojo extends AbstractMojo {
 
 	public static String getJSHintScript(String version)
 	{
-	    return String.format("/META-INF/resources/webjars/jshint/%s/jshint.js", version);
+	    return String.format("/META-INF/resources/webjars/jshint/%s/dist/jshint.js", version);
 	}
 
     public static String getJSHintVersion() throws MojoExecutionException
     {
         try {
             Properties jsHintProperties = new Properties();
-            jsHintProperties.load(Mojo.class.getResourceAsStream("/META-INF/maven/org.webjars/jshint/pom.properties"));
+            jsHintProperties.load(Mojo.class.getResourceAsStream("/META-INF/maven/org.webjars.npm/jshint/pom.properties"));
             return jsHintProperties.getProperty("version");
         } catch (IOException e) {
             throw new MojoExecutionException("Failed to determine the JSHint version in use.", e);
