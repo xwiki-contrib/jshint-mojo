@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>parent-commons</artifactId>
-    <version>13.7</version>
+    <version>13.10</version>
   </parent>
   <artifactId>jshint-maven-plugin</artifactId>
   <version>1.8-SNAPSHOT</version>
@@ -11,6 +11,9 @@
   <name>${project.artifactId}</name>
   <description>A maven mojo that integrates the JSHint JavaScript preprocessor.</description>
   <url>https://github.com/xwiki-contrib/jshint-mojo</url>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
+  </properties>
   <licenses>
     <license>
       <name>GPL 2 + classpath exception</name>
